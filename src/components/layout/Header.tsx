@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import {
   Search,
   Sun,
@@ -24,18 +25,21 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const { userProfile, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const [isDark, setIsDark] = useState(true)
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   const locale = pathname.startsWith('/fr') ? 'fr' : 'en'
 
-  const toggleTheme = useCallback(() => {
-    setIsDark((prev) => {
-      const next = !prev
-      document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
-      return next
-    })
+  useEffect(() => {
+    setMounted(true)
   }, [])
+
+  const isDark = mounted ? resolvedTheme === 'dark' : true
+
+  const toggleTheme = useCallback(() => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  }, [resolvedTheme, setTheme])
 
   const handleLogout = async () => {
     try {

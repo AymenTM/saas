@@ -29,7 +29,6 @@ export default async function RootLayout({
       <Toaster
         position="top-right"
         richColors
-        theme="dark"
         toastOptions={{
           style: {
             background: 'var(--bg-card)',
