@@ -132,7 +132,7 @@ export async function generateSubscriptionPDF(data: PDFData): Promise<void> {
   doc.setFont('helvetica', 'bold')
   doc.text('Prix / Price:', 14, y)
   doc.setFont('helvetica', 'bold')
-  doc.text(formatCurrency(data.price), 55, y)
+  doc.text(formatCurrency(data.price).replace(/[\s\u202F\u00A0]/g, ' '), 55, y)
 
   y += 15
 
