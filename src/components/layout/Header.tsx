@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import {
-  Search,
   Sun,
   Moon,
   LogOut,
@@ -94,28 +93,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
         </span>
       </div>
 
-      {/* Desktop Search bar */}
-      <div className="desktop-only" style={{ flex: 1, maxWidth: '380px' }}>
-        <div style={{ position: 'relative' }}>
-          <Search
-            size={15}
-            style={{
-              position: 'absolute',
-              left: '0.75rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--text-muted)',
-            }}
-          />
-          <input
-            type="search"
-            placeholder={locale === 'fr' ? 'Rechercher...' : 'Search...'}
-            className="input-base"
-            style={{ paddingLeft: '2.25rem', height: '38px', fontSize: '0.875rem' }}
-            readOnly
-          />
-        </div>
-      </div>
 
       {/* Header controls right */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginLeft: 'auto' }}>
