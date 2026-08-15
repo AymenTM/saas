@@ -1,0 +1,98 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ────────────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    function getUserCompanyId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.companyId;
+    }
+
+    function belongsToSameCompany(resource) {
+      return isAuthenticated() &&
+        resource.data.companyId == getUserCompanyId();
+    }
+
+    function isCompanyAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'company_admin';
+    }
+
+    function isEmployee() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employee';
+    }
+
+    function canWrite() {
+      return isAuthenticated() && !isEmployee();
+    }
+
+    // ─── Companies ───────────────────────────────────────────────────────────
+    match /companies/{companyId} {
+      allow read: if isSuperAdmin() ||
+        (isAuthenticated() && getUserCompanyId() == companyId);
+      allow write: if isSuperAdmin();
+    }
+
+    // ─── Users ───────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isSuperAdmin() ||
+        (isAuthenticated() && (
+          request.auth.uid == userId ||
+          getUserCompanyId() == resource.data.companyId
+        ));
+      allow create, update: if isSuperAdmin() || isCompanyAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // ─── Customers ───────────────────────────────────────────────────────────
+    match /customers/{customerId} {
+      allow read: if belongsToSameCompany(resource);
+      allow create: if isAuthenticated() &&
+        request.resource.data.companyId == getUserCompanyId() &&
+        !isEmployee();
+      allow update: if belongsToSameCompany(resource) && !isEmployee();
+      allow delete: if belongsToSameCompany(resource) && isCompanyAdmin();
+    }
+
+    // ─── Vehicles ────────────────────────────────────────────────────────────
+    match /vehicles/{vehicleId} {
+      allow read: if belongsToSameCompany(resource);
+      allow create: if isAuthenticated() &&
+        request.resource.data.companyId == getUserCompanyId() &&
+        !isEmployee();
+      allow update: if belongsToSameCompany(resource) && !isEmployee();
+      allow delete: if belongsToSameCompany(resource) && isCompanyAdmin();
+    }
+
+    // ─── Subscriptions ───────────────────────────────────────────────────────
+    match /subscriptions/{subscriptionId} {
+      // Public read by token is handled server-side via Admin SDK (bypasses rules)
+      allow read: if belongsToSameCompany(resource);
+      allow create: if isAuthenticated() &&
+        request.resource.data.companyId == getUserCompanyId() &&
+        !isEmployee();
+      allow update: if belongsToSameCompany(resource) && !isEmployee();
+      allow delete: if belongsToSameCompany(resource) && isCompanyAdmin();
+    }
+
+    // ─── Payments ────────────────────────────────────────────────────────────
+    match /payments/{paymentId} {
+      allow read: if belongsToSameCompany(resource);
+      allow create: if isAuthenticated() &&
+        request.resource.data.companyId == getUserCompanyId() &&
+        !isEmployee();
+      allow update: if belongsToSameCompany(resource) && isCompanyAdmin();
+      allow delete: if belongsToSameCompany(resource) && isCompanyAdmin();
+    }
+  }
+}
