@@ -126,7 +126,7 @@ export default function SubscriptionDetailPage({ params }: PageProps) {
             <QrCode size={18} color="var(--brand)" /> QR Code de vérification
           </div>
 
-          <QRCodeDisplay value={subscription.token} size={180} />
+          <QRCodeDisplay value={publicUrl} size={180} />
 
           <div style={{ marginTop: '1.25rem', width: '100%' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.375rem', textAlign: 'left' }}>

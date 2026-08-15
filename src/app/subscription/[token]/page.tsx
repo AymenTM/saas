@@ -207,7 +207,7 @@ export default async function PublicSubscriptionPage({ params }: PageProps) {
           <div style={{ padding: '1.25rem' }}>
             {/* QR Code section */}
             <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-              <QRCodeDisplay value={token} size={160} />
+              <QRCodeDisplay value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://parksub.vercel.app'}/subscription/${token}`} size={160} />
               <div
                 style={{
                   fontSize: '0.75rem',
