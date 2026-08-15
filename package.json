@@ -49,6 +49,11 @@
     "uuid": "^14.0.1",
     "zod": "^3.25.76"
   },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "4.15.9"
+    }
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
